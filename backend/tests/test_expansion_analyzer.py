@@ -1,77 +1,36 @@
-from backend.app.optimization.expansion_analyzer import (
-    ExpansionAnalyzer
-)
+from backend.app.optimization.expansion_analyzer import ExpansionAnalyzer
+
+analyzer = ExpansionAnalyzer()
 
 
 def test_expandable_site():
+    site = {
+        "land_area": 250,
+        "overall_score": 90
+    }
 
-    analyzer = ExpansionAnalyzer()
+    result = analyzer.analyze(site)
 
-    result = analyzer.analyze({
-        "maximum_capacity_mw": 100,
-        "current_capacity_mw": 60
-    })
-
-    assert result["expansion_status"] == (
-        "Expandable"
-    )
-
-    assert result["remaining_capacity_mw"] == 40
+    assert result["expansion_status"] == "Expandable"
 
 
 def test_limited_expansion_site():
+    site = {
+        "land_area": 150,
+        "overall_score": 70
+    }
 
-    analyzer = ExpansionAnalyzer()
+    result = analyzer.analyze(site)
 
-    result = analyzer.analyze({
-        "maximum_capacity_mw": 100,
-        "current_capacity_mw": 80
-    })
-
-    assert result["expansion_status"] == (
-        "Limited Expansion"
-    )
-
-    assert result["remaining_capacity_mw"] == 20
+    assert result["expansion_status"] == "Limited Expansion"
 
 
 def test_not_expandable_site():
+    site = {
+        "land_area": 60,
+        "overall_score": 50
+    }
 
-    analyzer = ExpansionAnalyzer()
+    result = analyzer.analyze(site)
 
-    result = analyzer.analyze({
-        "maximum_capacity_mw": 100,
-        "current_capacity_mw": 95
-    })
-
-    assert result["expansion_status"] == (
-        "Not Expandable"
-    )
-
-
-def test_fully_utilized_site():
-
-    analyzer = ExpansionAnalyzer()
-
-    result = analyzer.analyze({
-        "maximum_capacity_mw": 100,
-        "current_capacity_mw": 100
-    })
-
-    assert result["expansion_status"] == (
-        "Not Expandable"
-    )
-
-
-def test_invalid_maximum_capacity():
-
-    analyzer = ExpansionAnalyzer()
-
-    result = analyzer.analyze({
-        "maximum_capacity_mw": 0,
-        "current_capacity_mw": 50
-    })
-
-    assert result["expansion_status"] == (
-        "Not Expandable"
-    )
+    assert result["expansion_status"] == "Not Expandable"

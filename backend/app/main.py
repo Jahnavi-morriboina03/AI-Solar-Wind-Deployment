@@ -12,6 +12,7 @@ from backend.app.api.sites import router as sites_router
 from backend.app.api.predictions import router as predictions_router
 from backend.app.api.feature import router as features_router
 from backend.app.api.solar import router as solar_router
+from backend.app.api.analysis import router as analysis_router
 
 
 #create Fstapi application
@@ -25,10 +26,23 @@ app.include_router(sites_router)
 app.include_router(predictions_router)
 app.include_router(features_router)
 app.include_router(solar_router)
+app.include_router(analysis_router)
 #Home endpoint
-#@app.get("/")
-#def home():
-#    return {
-   #     "message": "Solar & Wind Deployment Intelligence Platform"
- #   }
+@app.get("/")
+def home():
+    return {
+       "message": "Solar & Wind Deployment Intelligence Platform"
+    }
 
+@app.get("/about")
+def about():
+    return {
+        "project": "Solar & Wind Deployment Intelligence Platform"
+    }
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "Running"
+    }

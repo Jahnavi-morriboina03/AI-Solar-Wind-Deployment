@@ -1,91 +1,36 @@
-from typing import Dict
+from backend.app.optimization.deployment_optimizer import DeploymentOptimizer
+from backend.app.optimization.capacity_planner import CapacityPlanner
+from backend.app.optimization.expansion_analyzer import ExpansionAnalyzer
 
 
 class DeploymentPlanGenerator:
-    """
-    Generates a complete deployment plan by combining
-    deployment strategy, capacity planning, and
-    expansion feasibility results.
-    """
 
-    def generate_plan(
-        self,
-        deployment_result: Dict,
-        capacity_result: Dict,
-        expansion_result: Dict
-    ) -> Dict:
+    def __init__(self):
+        self.optimizer = DeploymentOptimizer()
+        self.capacity_planner = CapacityPlanner()
+        self.expansion_analyzer = ExpansionAnalyzer()
 
-        technology = deployment_result.get(
-            "deployment",
-            "Not Recommended"
-        )
+    def generate_plan(self, site):
 
-        total_capacity = capacity_result.get(
-            "total_capacity_mw",
-            0.0
-        )
+        deployment = self.optimizer.determine_strategy(site)
 
-        expansion_status = expansion_result.get(
-            "expansion_status",
-            "Not Expandable"
-        )
+        # Pass the selected technology to the capacity planner
+        site["deployment"] = deployment["deployment"]
 
-        remarks = self._generate_remarks(
-            technology,
-            total_capacity,
-            expansion_status
+        capacity = self.capacity_planner.estimate_capacity(site)
+
+        expansion = self.expansion_analyzer.analyze(site)
+
+        remarks = (
+            f"{deployment['reason']} "
+            f"Recommended capacity: {capacity['recommended_capacity']} MW. "
+            f"Expansion status: {expansion['expansion_status']}."
         )
 
         return {
-            "recommended_technology": technology,
-            "recommended_capacity_mw": total_capacity,
-            "expansion_status": expansion_status,
+            "recommended_technology": deployment["deployment"],
+            "recommended_capacity": f"{capacity['recommended_capacity']} MW",
+            "expansion_status": expansion["expansion_status"],
             "optimization_remarks": remarks
         }
-
-    def _generate_remarks(
-        self,
-        technology: str,
-        capacity: float,
-        expansion_status: str
-    ) -> str:
-
-        if technology == "Hybrid":
-            technology_remark = (
-                "Hybrid deployment is recommended "
-                "to utilize both solar and wind resources."
-            )
-
-        elif technology == "Solar":
-            technology_remark = (
-                "Solar deployment is recommended "
-                "based on the available solar resource."
-            )
-
-        elif technology == "Wind":
-            technology_remark = (
-                "Wind deployment is recommended "
-                "based on the available wind resource."
-            )
-
-        else:
-            technology_remark = (
-                "The site is not currently suitable "
-                "for renewable energy deployment."
-            )
-
-        capacity_remark = (
-            f" Recommended capacity is "
-            f"{capacity} MW."
-        )
-
-        expansion_remark = (
-            f" Future expansion status: "
-            f"{expansion_status}."
-        )
-
-        return (
-            technology_remark
-            + capacity_remark
-            + expansion_remark
-        )
+    

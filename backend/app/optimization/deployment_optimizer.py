@@ -1,53 +1,37 @@
-from typing import Dict
-
-
 class DeploymentOptimizer:
-    """
-    Determines the most suitable renewable energy deployment strategy
-    based on evaluated site details.
-    """
 
-    def __init__(
-        self,
-        solar_threshold: float = 70,
-        wind_threshold: float = 70,
-        hybrid_threshold: float = 70
-    ):
-        self.solar_threshold = solar_threshold
-        self.wind_threshold = wind_threshold
-        self.hybrid_threshold = hybrid_threshold
+    def determine_strategy(self, site):
+        solar = site.get("solar_score", 0)
+        wind = site.get("wind_score", 0)
+        overall = site.get("overall_score", 0)
 
-    def optimize(self, site_details: Dict) -> Dict:
-        """
-        Determine the best deployment strategy.
-
-        Expected input:
-        {
-            "solar_score": 85,
-            "wind_score": 40
-        }
-        """
-
-        solar_score = site_details.get("solar_score", 0)
-        wind_score = site_details.get("wind_score", 0)
-
-        if (
-            solar_score >= self.hybrid_threshold
-            and wind_score >= self.hybrid_threshold
-        ):
+        if solar >= 75 and wind >= 75:
             deployment = "Hybrid"
+            confidence = min(overall + 5, 100)
+            reason = "Both solar and wind resources are suitable for hybrid deployment."
 
-        elif solar_score >= self.solar_threshold:
+        elif solar >= 75 and wind < 70:
             deployment = "Solar"
+            confidence = solar
+            reason = "High solar resource makes solar deployment the best option."
 
-        elif wind_score >= self.wind_threshold:
+        elif wind >= 75 and solar < 70:
             deployment = "Wind"
+            confidence = wind
+            reason = "Strong wind resource makes wind deployment the best option."
+
+        elif solar >= wind:
+            deployment = "Solar"
+            confidence = solar
+            reason = "Solar resource performs better than wind."
 
         else:
-            deployment = "Not Recommended"
+            deployment = "Wind"
+            confidence = wind
+            reason = "Wind resource performs better than solar."
 
         return {
             "deployment": deployment,
-            "solar_score": solar_score,
-            "wind_score": wind_score
+            "confidence": confidence,
+            "reason": reason,
         }

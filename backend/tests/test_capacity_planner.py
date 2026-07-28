@@ -1,65 +1,47 @@
-from backend.app.optimization.capacity_planner import (
-    CapacityPlanner
-)
+from backend.app.optimization.capacity_planner import CapacityPlanner
+
+planner = CapacityPlanner()
 
 
-def test_solar_capacity():
-
-    planner = CapacityPlanner()
-
-    result = planner.plan_capacity({
-        "land_area": 100,
-        "solar_score": 80,
-        "wind_score": 40,
+def test_small_site():
+    site = {
+        "land_area": 15,
         "deployment": "Solar"
-    })
+    }
 
-    assert result["solar_capacity_mw"] == 16.0
-    assert result["wind_capacity_mw"] == 0.0
-    assert result["total_capacity_mw"] == 16.0
+    result = planner.estimate_capacity(site)
+
+    assert result["recommended_capacity"] == 5
 
 
-def test_wind_capacity():
-
-    planner = CapacityPlanner()
-
-    result = planner.plan_capacity({
-        "land_area": 100,
-        "solar_score": 40,
-        "wind_score": 80,
+def test_medium_site():
+    site = {
+        "land_area": 60,
         "deployment": "Wind"
-    })
+    }
 
-    assert result["solar_capacity_mw"] == 0.0
-    assert result["wind_capacity_mw"] == 80.0
-    assert result["total_capacity_mw"] == 80.0
+    result = planner.estimate_capacity(site)
+
+    assert result["recommended_capacity"] == 25
 
 
-def test_hybrid_capacity():
-
-    planner = CapacityPlanner()
-
-    result = planner.plan_capacity({
-        "land_area": 100,
-        "solar_score": 80,
-        "wind_score": 70,
+def test_large_site():
+    site = {
+        "land_area": 150,
         "deployment": "Hybrid"
-    })
+    }
 
-    assert result["solar_capacity_mw"] == 16.0
-    assert result["wind_capacity_mw"] == 70.0
-    assert result["total_capacity_mw"] == 86.0
+    result = planner.estimate_capacity(site)
+
+    assert result["recommended_capacity"] == 50
 
 
-def test_zero_land_area():
+def test_extra_large_site():
+    site = {
+        "land_area": 250,
+        "deployment": "Solar"
+    }
 
-    planner = CapacityPlanner()
+    result = planner.estimate_capacity(site)
 
-    result = planner.plan_capacity({
-        "land_area": 0,
-        "solar_score": 90,
-        "wind_score": 90,
-        "deployment": "Hybrid"
-    })
-
-    assert result["total_capacity_mw"] == 0.0
+    assert result["recommended_capacity"] == 100
