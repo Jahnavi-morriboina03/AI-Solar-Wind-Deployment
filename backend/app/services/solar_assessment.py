@@ -1,19 +1,28 @@
 
+from backend.app.data_sources.nasa_power import NasaPowerClient
+
 
 class SolarAssessmentService:
 
-    def classify_solar_site(self, solar_irradiance: float) -> str:
-        """
-        Classify solar energy potential.
+    def __init__(self):
+        self.client = NasaPowerClient()
 
-        < 3 kWh/m²/day -> Poor
-        3–5             -> Moderate
-        5–7             -> Good
-        > 7             -> Excellent
-        """
+    def get_solar_data(
+        self,
+        latitude: float,
+        longitude: float
+    ):
+        return self.client.fetch(latitude, longitude)
+
+    def classify_solar_site(
+        self,
+        solar_irradiance: float
+    ) -> str:
 
         if solar_irradiance < 0:
-            raise ValueError("Solar irradiance cannot be negative.")
+            raise ValueError(
+                "Solar irradiance cannot be negative."
+            )
 
         if solar_irradiance < 3:
             return "Poor"
