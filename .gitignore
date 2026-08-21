@@ -35,3 +35,9 @@ Thumbs.db
 
 # Trained model files
 models/*.pkl
+
+# Large datasets
+datasets/
+
+# README
+README.md
